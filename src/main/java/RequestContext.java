@@ -34,6 +34,7 @@ public class RequestContext {
 
     public void sendCommand(BufferedWriter _out, int status) throws IOException {
         switch (status){
+            //all worked okay
             case 0:
                 System.out.println("srv: " + __myVerb + " request is being processed");
                 switch (__myVerb){
@@ -59,6 +60,7 @@ public class RequestContext {
                 }
 
                 break;
+            //problems...
             case 1:
                 _out.write("Command is not supported\r\n");
                 break;
@@ -166,6 +168,7 @@ public class RequestContext {
         return 0;
     }
 
+    //to be written
     private void get(){
 
     }

@@ -37,15 +37,19 @@ public class Comm {
                 _handler.__message = first_line[1];
                 _handler.__version = first_line[2];
 
+                //check for errors
                 _status = _handler.checkStatus();
                 http_first_line = false;
             } else {
+                //if errors do not continue
                 if(_status != 0){
                     break;
                 }
                 String[] other_lines = line.split(": ");
                 _handler.__header.put(other_lines[0], other_lines[1]);
             }
+
+            //read body/payload of message as well
         }
 
         //return response
@@ -56,7 +60,6 @@ public class Comm {
     private void sendResponse() throws IOException {
         //send response back
         //determine the answer
-
         _out.write("HTTP/1.1 200 OK\r\n");
         _out.write("Content-Type: text/html\r\n");
         _out.write("Content-Length: 100\r\n");
