@@ -1,70 +1,41 @@
 import java.io.*;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.NClob;
 
 public class WebService {
 
-    private static ServerSocket _listener = null;
+    private static ServerSocket _sSocket = null;
+    private static int _port;
+
+    private static Comm comm;
 
     public static void main(String args[]) throws IOException {
-        System.out.println("start server");
+        System.out.println("srv: Starting server...");
 
+        //start the server
+        try{
+            _port = Integer.parseInt(args[0]);
+        }catch(Exception e){
+            System.out.println("srv: Please enter a valid port!");
+            return;
+        }
 
-        int port = 1989;
-        ServerSocket serverSocket = new ServerSocket(port);
-        System.err.println("Serveur lancé sur le port : " + port);
+        _sSocket = new ServerSocket(_port);
+        System.err.println("srv: Server is running in port " + _port);
 
         // repeatedly wait for connections, and process
         while (true) {
-            // on reste bloqué sur l'attente d'une demande client
-            Socket clientSocket = serverSocket.accept();
-            System.err.println("New client");
+            // connect to client
+            Socket clientSocket = _sSocket.accept();
+            System.err.println("srv: New client");
 
-            // on ouvre un flux de converation
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
-
-            // chaque fois qu'une donnée est lue sur le réseau on la renvoi sur
-            // le flux d'écriture.
-            // la donnée lue est donc retournée exactement au même client.
-            String s;
-            int status = 0;
-            while ((s = in.readLine()) != null) {
-                System.out.println(s);
-                if (s.isEmpty()) {
-                    break;
-                }
-                if(s.contains("GET")){
-                    status = 1;
-                }
-                if(s.contains("POST")){
-                    status = 2;
-                }
-            }
+            //initialize communication
+            comm = new Comm(clientSocket);
+            comm.readRequest();
+            comm.sendResponse();
+            //comm.closeComm();
 
 
-            out.write("HTTP/1.0 200 OK\r\n");
-            out.write("Date: Fri, 31 Dec 1999 23:59:59 GMT\r\n");
-            out.write("Server: Apache/0.8.4\r\n");
-            out.write("Content-Type: text/html\r\n");
-            out.write("Content-Length: 59\r\n");
-            out.write("Expires: Sat, 01 Jan 2000 00:59:59 GMT\r\n");
-            out.write("Last-modified: Fri, 09 Aug 1996 14:21:40 GMT\r\n");
-            out.write("\r\n");
-            out.write("<TITLE>Exemple</TITLE>");
-            if(status == 1){
-                out.write("<p> GET </p>");
-            }else if(status == 2){
-                out.write("<P>POST</P>");
-            }
-
-            // on ferme les flux.
-            System.err.println("Old client kill");
-            out.close();
-            in.close();
             clientSocket.close();
 
         }
