@@ -4,10 +4,11 @@ import java.net.Socket;
 public class Comm {
 
     //reader and writer are ready
-    private Socket _clientSocket = null;
-    private RequestContext _handler = new RequestContext();
-    BufferedReader _in = null;
-    BufferedWriter _out = null;
+    Socket _clientSocket;
+    private final RequestContext _handler = new RequestContext();
+    BufferedReader _in;
+    BufferedWriter _out;
+    private int _status = 0;
 
     public Comm(Socket clientSocket)  throws IOException{
         this._clientSocket = clientSocket;
@@ -17,6 +18,7 @@ public class Comm {
 
     //read request
     public void readRequest() throws IOException {
+        System.out.println("srv: Request received");
         String line;
         boolean http_first_line = true;
 
@@ -27,32 +29,38 @@ public class Comm {
                 break;
             }
             if (http_first_line) {
+                //initialize RequestContext type
+                String[] first_line = line.split(" ");
+                _handler.setMyVerb(first_line[0]);
+                _handler.__message = first_line[1];
+                _handler.__version = first_line[2];
+
+                _status = _handler.checkStatus();
 
                 http_first_line = false;
             } else {
-
+                if(_status == 0){
+                    break;
+                }
+                String[] other_lines = line.split(": ");
+                _handler.__header.put(other_lines[0], other_lines[1]);
             }
-            System.out.println(line);
         }
-        System.out.println("srv: Request received");
 
     }
 
     public void sendResponse() throws IOException {
         //send response back
+        //determine the answer
+
         _out.write("HTTP/1.1 200 OK\r\n");
         _out.write("Content-Type: text/html\r\n");
         _out.write("Content-Length: 100\r\n");
         _out.write("\r\n");
-        _out.write("<TITLE>Example</TITLE>\r\n");
-        System.err.println("srv: Old client kill");
-        if(_handler.getMyVerb() == Verb.GET){
-            _out.write("<p> get </p>");
-        }else if(_handler.getMyVerb() == Verb.POST){
-            _out.write("<p>POST </p>");
-        }else{
-            _out.write("<p>Other</p>");
-        }
+
+        _handler.sendCommand(_out);
+        //_handler.showHeader(_out);
+
         _out.flush();
         System.err.println("srv: Old client kill");
 
