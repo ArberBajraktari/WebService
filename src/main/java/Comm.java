@@ -6,8 +6,8 @@ public class Comm {
     //reader and writer are ready
     Socket _clientSocket;
     private final RequestContext _handler = new RequestContext();
-    BufferedReader _in;
-    BufferedWriter _out;
+    private final BufferedReader _in;
+    private final BufferedWriter _out;
     private int _status = 0;
 
     public Comm(Socket clientSocket)  throws IOException{
@@ -28,6 +28,8 @@ public class Comm {
             if (line.isEmpty()) {
                 break;
             }
+
+            //save request header
             if (http_first_line) {
                 //initialize RequestContext type
                 String[] first_line = line.split(" ");
@@ -36,10 +38,9 @@ public class Comm {
                 _handler.__version = first_line[2];
 
                 _status = _handler.checkStatus();
-
                 http_first_line = false;
             } else {
-                if(_status == 0){
+                if(_status != 0){
                     break;
                 }
                 String[] other_lines = line.split(": ");
@@ -47,9 +48,12 @@ public class Comm {
             }
         }
 
+        //return response
+        sendResponse();
+
     }
 
-    public void sendResponse() throws IOException {
+    private void sendResponse() throws IOException {
         //send response back
         //determine the answer
 
@@ -58,9 +62,9 @@ public class Comm {
         _out.write("Content-Length: 100\r\n");
         _out.write("\r\n");
 
-        _handler.sendCommand(_out);
-        //_handler.showHeader(_out);
+        _handler.sendCommand(_out, _status);
 
+        //_handler.showHeader();
         _out.flush();
         System.err.println("srv: Old client kill");
 

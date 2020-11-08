@@ -4,12 +4,12 @@ import java.net.Socket;
 
 public class WebService {
 
-    private static ServerSocket _sSocket = null;
-    private static int _port;
+    static ServerSocket _sSocket = null;
+    static int _port;
 
-    private static Comm comm;
+    static Comm comm;
 
-    public static void main(String args[]) throws IOException {
+    public static void main(String[] args) throws IOException {
         System.out.println("srv: Starting server...");
 
         //start the server
@@ -24,6 +24,7 @@ public class WebService {
         System.err.println("srv: Server is running in port " + _port);
 
         // repeatedly wait for connections, and process
+        // noinspection InfiniteLoopStatement
         while (true) {
             // connect to client
             Socket clientSocket = _sSocket.accept();
@@ -33,9 +34,8 @@ public class WebService {
             comm = new Comm(clientSocket);
 
             comm.readRequest();
-            comm.sendResponse();
-            comm.closeComm();
 
+            comm.closeComm();
             clientSocket.close();
 
         }
