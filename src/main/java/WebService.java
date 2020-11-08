@@ -31,10 +31,10 @@ public class WebService {
 
             //initialize communication
             comm = new Comm(clientSocket);
+
             comm.readRequest();
             comm.sendResponse();
-            //comm.closeComm();
-
+            comm.closeComm();
 
             clientSocket.close();
 
