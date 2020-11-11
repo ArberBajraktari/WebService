@@ -1,3 +1,5 @@
+package http.server;
+
 public enum Verb {
     GET,
     POST,

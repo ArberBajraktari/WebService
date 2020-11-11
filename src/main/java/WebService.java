@@ -1,3 +1,5 @@
+import http.server.Comm;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -6,11 +8,11 @@ public class WebService {
 
     static ServerSocket _sSocket = null;
     static int _port;
-
     static Comm comm;
 
     public static void main(String[] args) throws IOException {
         System.out.println("srv: Starting server...");
+
 
         //start the server
         try{
@@ -28,14 +30,19 @@ public class WebService {
         while (true) {
             // connect to client
             Socket clientSocket = _sSocket.accept();
-            System.err.println("srv: New client");
+            System.out.println("srv: New client");
 
             //initialize communication
             comm = new Comm(clientSocket);
 
+            //read command
             comm.readRequest();
 
+            //send reply to command
             comm.closeComm();
+
+
+            //close the client socket
             clientSocket.close();
 
         }

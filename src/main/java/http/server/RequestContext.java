@@ -1,9 +1,11 @@
+package http.server;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RequestContext {
+abstract class RequestContext {
 
     protected Verb __myVerb = Verb.OTHER;
     protected String __message;
@@ -12,7 +14,7 @@ public class RequestContext {
     protected Map<String, String> __header = new HashMap<>();
 
 
-    public void setMyVerb(String myVerb) {
+    protected void setMyVerb(String myVerb) {
         switch (myVerb) {
             case "GET":
                 __myVerb = Verb.GET;
@@ -32,7 +34,7 @@ public class RequestContext {
         }
     }
 
-    public void sendCommand(BufferedWriter _out, int status) throws IOException {
+    protected void sendCommand(BufferedWriter _out, int status) throws IOException {
         switch (status){
             //all worked okay
             case 0:
@@ -101,7 +103,7 @@ public class RequestContext {
         }
     }
 
-    public int checkStatus(){
+    protected int checkStatus(){
         //if different command was chosen
         // 1 - command not supported
         // 2 - too many parameters
@@ -169,19 +171,19 @@ public class RequestContext {
     }
 
     //to be written
-    private void get(){
+    protected void get(){
 
     }
 
-    private void post(){
+    protected void post(){
 
     }
 
-    private void put(){
+    protected void put(){
 
     }
 
-    private void delete(){
+    protected void delete(){
 
     }
 

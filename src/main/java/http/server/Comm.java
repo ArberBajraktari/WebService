@@ -1,11 +1,12 @@
+package http.server;
+
 import java.io.*;
 import java.net.Socket;
 
-public class Comm {
+public class Comm extends RequestContext {
 
     //reader and writer are ready
     Socket _clientSocket;
-    private final RequestContext _handler = new RequestContext();
     private final BufferedReader _in;
     private final BufferedWriter _out;
     private int _status = 0;
@@ -31,14 +32,14 @@ public class Comm {
 
             //save request header
             if (http_first_line) {
-                //initialize RequestContext type
+                //initialize http.server.RequestContext type
                 String[] first_line = line.split(" ");
-                _handler.setMyVerb(first_line[0]);
-                _handler.__message = first_line[1];
-                _handler.__version = first_line[2];
+                setMyVerb(first_line[0]);
+                __message = first_line[1];
+                __version = first_line[2];
 
                 //check for errors
-                _status = _handler.checkStatus();
+                _status = checkStatus();
                 http_first_line = false;
             } else {
                 //if errors do not continue
@@ -46,7 +47,7 @@ public class Comm {
                     break;
                 }
                 String[] other_lines = line.split(": ");
-                _handler.__header.put(other_lines[0], other_lines[1]);
+                __header.put(other_lines[0], other_lines[1]);
             }
 
             //read body/payload of message as well
@@ -65,7 +66,7 @@ public class Comm {
         _out.write("Content-Length: 100\r\n");
         _out.write("\r\n");
 
-        _handler.sendCommand(_out, _status);
+        sendCommand(_out, _status);
 
         //_handler.showHeader();
         _out.flush();
