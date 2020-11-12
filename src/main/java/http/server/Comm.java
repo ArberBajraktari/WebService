@@ -11,6 +11,9 @@ public class Comm extends RequestContext {
     private final BufferedWriter _out;
     private int _status = 0;
 
+    boolean http_first_line = true;
+    String line;
+
     public Comm(Socket clientSocket)  throws IOException{
         this._clientSocket = clientSocket;
         this._in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -20,8 +23,6 @@ public class Comm extends RequestContext {
     //read request
     public void readRequest() throws IOException {
         System.out.println("srv: Request received");
-        String line;
-        boolean http_first_line = true;
 
         //read and save request
         while ((line = _in.readLine()) != null) {
@@ -30,6 +31,7 @@ public class Comm extends RequestContext {
                 break;
             }
 
+            System.out.println("srv: Reading header...");
             //save request header
             if (http_first_line) {
                 //initialize http.server.RequestContext type
@@ -38,8 +40,6 @@ public class Comm extends RequestContext {
                 __message = first_line[1];
                 __version = first_line[2];
 
-                //check for errors
-                _status = checkStatus();
                 http_first_line = false;
             } else {
                 //if errors do not continue
@@ -50,7 +50,15 @@ public class Comm extends RequestContext {
                 __header.put(other_lines[0], other_lines[1]);
             }
 
-            //read body/payload of message as well
+            System.out.println("srv: Reading payload...");
+            while(_in.ready()){
+                __messageSave.append((char) _in.read());
+            }
+            __payload = __messageSave.substring(__messageSave.lastIndexOf("\r\n\r\n"));
+            //System.out.println("srv: Payload is: " + __payload);
+            //check for errors
+            _status = checkStatus();
+            break;
         }
 
         //return response

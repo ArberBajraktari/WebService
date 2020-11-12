@@ -10,6 +10,7 @@ abstract class RequestContext {
     protected Verb __myVerb = Verb.OTHER;
     protected String __message;
     protected String __version;
+    protected String __payload;
     protected StringBuilder __messageSave = new StringBuilder();
     protected Map<String, String> __header = new HashMap<>();
 
@@ -42,19 +43,23 @@ abstract class RequestContext {
                 switch (__myVerb){
                     case GET:
                         _out.write("get");
-                        System.out.println("get");
+                        get();
+//                        System.out.println("get");
                         break;
                     case POST:
                         _out.write("post");
-                        System.out.println("post");
+                        post();
+//                        System.out.println("post");
                         break;
                     case PUT:
                         _out.write("put");
-                        System.out.println("put");
+                        put();
+//                        System.out.println("put");
                         break;
                     case DELETE:
                         _out.write("delete");
-                        System.out.println("srv: Delete");
+                        delete();
+//                        System.out.println("srv: Delete");
                         break;
                     default:
                         _out.write("Error has occurred\r\n");
