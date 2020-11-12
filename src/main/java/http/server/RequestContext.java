@@ -35,7 +35,7 @@ abstract class RequestContext {
         }
     }
 
-    protected void sendCommand(BufferedWriter _out, int status) throws IOException {
+    protected void sendResult(BufferedWriter _out, int status) throws IOException {
         switch (status){
             //all worked okay
             case 0:
@@ -97,12 +97,12 @@ abstract class RequestContext {
             case 9:
                 _out.write("err: PUT has not text to update\r\n");
                 break;
-            case 10:
-                _out.write("err: No text needed\r\n");
+
         }
     }
 
     public void showHeader(){
+        System.out.println("header:");
         for (Map.Entry<String, String> entry : __header.entrySet()) {
             System.out.println(entry.getKey()+": "+entry.getValue() );
         }
@@ -128,6 +128,7 @@ abstract class RequestContext {
         }else{
             //split message
             String[] msg = __message.split("/");
+
             //check parameters
             if(msg.length > 3){
                 System.out.println("srv: Too many parameters");
@@ -138,7 +139,7 @@ abstract class RequestContext {
             }else{
                 if( msg.length == 3 && msg[2].contains("%20")){
                     System.out.println("srv: Extra text is written in the request");
-                    return 10;
+                    return 3;
                 }
 //
                 //check first parameter
