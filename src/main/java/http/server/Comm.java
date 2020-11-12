@@ -57,7 +57,7 @@ public class Comm extends RequestContext {
             __payload = __messageSave.substring(__messageSave.lastIndexOf("\r\n\r\n"));
             //System.out.println("srv: Payload is: " + __payload);
             //check for errors
-            _status = checkStatus();
+            _status = checkErrors();
             break;
         }
 

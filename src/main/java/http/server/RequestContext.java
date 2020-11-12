@@ -69,36 +69,36 @@ abstract class RequestContext {
                 break;
             //problems...
             case 1:
-                _out.write("Command is not supported\r\n");
+                _out.write("err: Command is not supported\r\n");
                 break;
             case 2:
-                _out.write("Too many parameters in the request\r\n");
+                _out.write("err: Too many parameters in the request\r\n");
                 break;
             case 3:
-                _out.write("Bad parameter\r\n");
-                _out.write("You have either an extra spacebar or bad input\r\n");
+                _out.write("err: Bad parameter\r\n");
+                _out.write("err: You have either an extra spacebar or bad input\r\n");
                 break;
             case 4:
-                _out.write("Few parameters\r\n");
+                _out.write("err: Few parameters\r\n");
                 break;
             case 5:
-                _out.write("POST accepts only 1 parameter\r\n");
+                _out.write("err: POST accepts only 1 parameter\r\n");
                 break;
             case 6:
-                _out.write("DELETE needs 2 parameters\r\n");
+                _out.write("err: DELETE needs 2 parameters\r\n");
                 _out.write("Write which message to delete\r\n");
                 break;
             case 7:
-                _out.write("PUT needs 2 parameters\r\n");
+                _out.write("err: PUT needs 2 parameters\r\n");
                 break;
             case 8:
-                _out.write("POST has no text to save\r\n");
+                _out.write("err: POST has no text to save\r\n");
                 break;
             case 9:
-                _out.write("PUT has not text to update\r\n");
+                _out.write("err: PUT has not text to update\r\n");
                 break;
             case 10:
-                _out.write("No text needed\r\n");
+                _out.write("err: No text needed\r\n");
         }
     }
 
@@ -108,7 +108,7 @@ abstract class RequestContext {
         }
     }
 
-    protected int checkStatus(){
+    protected int checkErrors(){
         //if different command was chosen
         // 1 - command not supported
         // 2 - too many parameters
