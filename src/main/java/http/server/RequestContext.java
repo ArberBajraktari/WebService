@@ -14,6 +14,9 @@ abstract class RequestContext {
     protected StringBuilder __messageSave = new StringBuilder();
     protected Map<String, String> __header = new HashMap<>();
 
+    public Verb get__myVerb() {
+        return __myVerb;
+    }
 
     protected void setMyVerb(String myVerb) {
         switch (myVerb) {

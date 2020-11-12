@@ -2,7 +2,9 @@ import http.server.Comm;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.powermock.api.mockito.PowerMockito;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -17,6 +19,7 @@ public class TestComm {
     ServerSocket mockServerSocket;
     Socket mockTestClientSocket;
     Comm com;
+    BufferedReader bufferedReader;
 
     @Before
     public void setup() {
@@ -27,11 +30,12 @@ public class TestComm {
         try {
             //prevent Unnecessary Stubbing exception with lenient()
             lenient().when(mockServerSocket.accept()).thenReturn(mockTestClientSocket);
+            bufferedReader = Mockito.mock(BufferedReader.class);
         } catch (IOException e) {
             fail(e.getMessage());
         }
 
-        mockTestClientSocket = mock(Socket.class);
+
         try {
             PipedOutputStream oStream = new PipedOutputStream();
             lenient().when(mockTestClientSocket.getOutputStream()).thenReturn(oStream);
@@ -59,12 +63,15 @@ public class TestComm {
     @Test
     public void test() {
         try {
-            BufferedReader bufferedReader = org.mockito.Mockito.mock(BufferedReader.class);
-            when(bufferedReader.readLine()).thenReturn("first line").thenReturn("second line");
-            com.set_in(bufferedReader);
+
+            BufferedReader br = new BufferedReader(new StringReader("GET /a g\r\nline2\r\nline3"));
+            com.set_in(br);
             com.readRequest();
+            System.out.println(com.get__myVerb());
 
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

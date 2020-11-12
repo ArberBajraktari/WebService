@@ -7,11 +7,9 @@ public class Comm extends RequestContext {
     //reader and writer are ready
     Socket _clientSocket;
     private BufferedReader _in;
-    private BufferedWriter _out;
-    private int _status = 0;
+    private final BufferedWriter _out;
 
     boolean http_first_line = true;
-    String line;
 
     public Comm(Socket clientSocket)  throws IOException{
         this._clientSocket = clientSocket;
@@ -37,6 +35,7 @@ public class Comm extends RequestContext {
         String[] request = __messageSave.toString().split(System.getProperty("line.separator"));
         __messageSave = new StringBuilder();
         for (String line: request){
+            System.out.println(line);
             if(!line.isEmpty()){
                 if (http_first_line) {
                     //saving folder and version
@@ -74,7 +73,7 @@ public class Comm extends RequestContext {
         //check if the request was in order
         //if yes send the response
         //if not, the output will tell the user what the problem is
-        _status = checkErrors();
+        int _status = checkErrors();
 
         //send response back
         //determine the answer
@@ -85,9 +84,8 @@ public class Comm extends RequestContext {
 
         //send the answer
         sendResult(_out, _status);
-
-        //_handler.showHeader();
         _out.flush();
+
         System.err.println("srv: Old client kill");
     }
 

@@ -38,6 +38,8 @@ public class WebService {
             //read command
             comm.readRequest();
 
+            comm.showHeader();
+
             //send reply to command
             comm.closeComm();
 
