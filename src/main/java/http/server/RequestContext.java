@@ -2,7 +2,9 @@ package http.server;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 abstract class RequestContext {
@@ -11,7 +13,10 @@ abstract class RequestContext {
     protected String __message;
     protected String __version;
     protected String __payload;
-    protected StringBuilder __messageSave = new StringBuilder();
+    protected String[] __command;
+    protected int __messagesNumber;
+    List<String> __messagesSaved = new ArrayList<>();
+    protected StringBuilder __messageSeparator = new StringBuilder();
     protected Map<String, String> __header = new HashMap<>();
 
     public Verb get__myVerb() {
@@ -45,8 +50,7 @@ abstract class RequestContext {
                 System.out.println("srv: " + __myVerb + " request is being processed");
                 switch (__myVerb){
                     case GET:
-                        _out.write("get");
-                        get();
+                        get(_out);
 //                        System.out.println("get");
                         break;
                     case POST:
@@ -100,6 +104,9 @@ abstract class RequestContext {
             case 9:
                 _out.write("err: PUT has not text to update\r\n");
                 break;
+            case 10:
+                _out.write("err: 3 parameter has to be a number\r\n");
+                break;
 
         }
     }
@@ -130,43 +137,53 @@ abstract class RequestContext {
             return 1;
         }else{
             //split message
-            String[] msg = __message.split("/");
+            __command = __message.split("/");
 
             //check parameters
-            if(msg.length > 3){
+            if(__command.length > 3){
                 System.out.println("srv: Too many parameters");
                 return 2;
-            }else if(msg.length < 2){
+            }else if(__command.length < 2){
                 System.out.println("srv: Too few parameters");
                 return 4;
             }else{
-                if( msg.length == 3 && msg[2].contains("%20")){
+                if( __command.length == 3 && __command[2].contains("%20")){
                     System.out.println("srv: Extra text is written in the request");
                     return 3;
                 }
+                //check if the index of the message asked is an int
+                if(__command.length == 3){
+                    try{
+                        __messagesNumber = Integer.parseInt(__command[2]);
+                    }catch(Exception e){
+                        System.out.println("srv: err: 3 parameter was not a number");
+                        return 10;
+                    }
+
+                }
 //
                 //check first parameter
-                if(!msg[1].equals("messages")){
+                if(!__command[1].equals("messages")){
                     System.out.println("srv: Command file not known");
                     return 3;
                 }else{
                     switch (__myVerb) {
                         case POST:
-                            if(msg.length == 3){
+                            if(__command.length == 3){
                                 System.out.println("srv: POST accepts only 1 parameter");
                                 return 5;
                             }
                             break;
 
                         case DELETE:
-                            if(msg.length == 2){
+                            if(__command.length == 2){
                                 System.out.println("srv: DELETE has few parameters");
                                 return 6;
                             }
                             break;
 
                         case PUT:
-                            if(msg.length == 2){
+                            if(__command.length == 2){
                                 System.out.println("srv: PUT has few parameters");
                                 return 7;
                             }
@@ -179,12 +196,40 @@ abstract class RequestContext {
         return 0;
     }
 
-    //to be written
-    protected void get(){
-
+    //returning the list to the user
+    protected void get(BufferedWriter _out) throws IOException {
+        //if it asked to list all messages
+        if( __command.length == 2) {
+            //list all messages
+            int count = 1;
+            System.out.println("srv: Returning messages indexes to the user...");
+            for (String ignored : __messagesSaved) {
+                _out.write(Integer.toString(count));
+                _out.write("\r\n");
+                count++;
+            }
+        //list one message only
+        }else{
+            if( __messagesNumber > __messagesSaved.size() ){
+                _out.write("err: List has only " + __messagesSaved.size() + "\r\n");
+            }else if(__messagesNumber <= 0){
+                _out.write("err: Please write a number bigger than 0\r\n");
+            }
+            else{
+                _out.write(__messagesSaved.get(__messagesNumber-1));
+            }
+        }
     }
 
+    //saving the body
     protected void post(){
+        System.out.println(__payload);
+        if (__payload.trim().isEmpty()){
+            __messagesSaved.add("[nothing was saved]");
+        }else{
+            __messagesSaved.add(__payload);
+        }
+
 
     }
 

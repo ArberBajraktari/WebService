@@ -1,6 +1,7 @@
 package http.server;
 import java.io.*;
 import java.net.Socket;
+import java.util.List;
 
 public class Comm extends RequestContext {
 
@@ -8,34 +9,35 @@ public class Comm extends RequestContext {
     Socket _clientSocket;
     private BufferedReader _in;
     private final BufferedWriter _out;
-
     boolean http_first_line = true;
 
-    public Comm(Socket clientSocket)  throws IOException{
+    public Comm(Socket clientSocket, List<String> __messagesSaved)  throws IOException{
         this._clientSocket = clientSocket;
         this._in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         this._out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+        this.__messagesSaved = __messagesSaved;
     }
 
     public void set_in(BufferedReader in){
         this._in = in;
     }
 
-    //read request
-    public void readRequest() throws IOException {
+    private void readMessage() throws IOException {
         //read and save request
         System.out.println("srv: Reading request...");
 
         //save request
         while (_in.ready()) {
-            __messageSave.append((char) _in.read());
+            __messageSeparator.append((char) _in.read());
         }
+    }
 
+
+    private void separateMessage(){
         //separate message
-        String[] request = __messageSave.toString().split(System.getProperty("line.separator"));
-        __messageSave = new StringBuilder();
+        String[] request = __messageSeparator.toString().split(System.getProperty("line.separator"));
+        __messageSeparator = new StringBuilder();
         for (String line: request){
-            System.out.println(line);
             if(!line.isEmpty()){
                 if (http_first_line) {
                     //saving folder and version
@@ -53,16 +55,22 @@ public class Comm extends RequestContext {
                     }
                     //saving the payload
                     else{
-                        __messageSave.append( line );
-                        __messageSave.append( "\r\n" );
+                        __messageSeparator.append( line );
+                        __messageSeparator.append( "\r\n" );
                     }
 
                 }
             }
         }
-        __payload = __messageSave.toString();
+        __payload = __messageSeparator.toString();
 
+    }
 
+    //read request
+    public void readRequest() throws IOException {
+
+        readMessage();
+        separateMessage();
         sendResponse();
 
     }

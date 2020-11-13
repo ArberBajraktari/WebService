@@ -3,12 +3,15 @@ import http.server.Comm;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class WebService {
 
     static ServerSocket _sSocket = null;
     static int _port;
     static Comm comm;
+    static List<String> __messagesSaved = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
         System.out.println("srv: Starting server...");
@@ -33,14 +36,13 @@ public class WebService {
             System.out.println("srv: New client");
 
             //initialize communication
-            comm = new Comm(clientSocket);
+            comm = new Comm(clientSocket, __messagesSaved);
 
             //read command
+            //send reply to command
             comm.readRequest();
 
-            comm.showHeader();
-
-            //send reply to command
+            //close communication
             comm.closeComm();
 
 

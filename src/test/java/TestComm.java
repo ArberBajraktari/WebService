@@ -48,11 +48,11 @@ public class TestComm {
             fail(e.getMessage());
         }
 
-        try {
-            com = new Comm(mockTestClientSocket);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            com = new Comm(mockTestClientSocket);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     // return an InputStream with a dummy request
