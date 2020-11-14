@@ -51,22 +51,15 @@ abstract class RequestContext {
                 switch (__myVerb){
                     case GET:
                         get(_out);
-//                        System.out.println("get");
                         break;
                     case POST:
-                        _out.write("post");
-                        post();
-//                        System.out.println("post");
+                        post(_out);
                         break;
                     case PUT:
-                        _out.write("put");
-                        put();
-//                        System.out.println("put");
+                        put(_out);
                         break;
                     case DELETE:
-                        _out.write("delete");
-                        delete();
-//                        System.out.println("srv: Delete");
+                        delete(_out);
                         break;
                     default:
                         _out.write("Error has occurred\r\n");
@@ -202,11 +195,14 @@ abstract class RequestContext {
         if( __command.length == 2) {
             //list all messages
             int count = 1;
-            System.out.println("srv: Returning messages indexes to the user...");
+            System.out.println("srv: Returning the list of messages to the user...");
             for (String ignored : __messagesSaved) {
                 _out.write(Integer.toString(count));
                 _out.write("\r\n");
                 count++;
+            }
+            if(__messagesSaved.size() == 0){
+                _out.write("List is empty!\r\nPlease add a message");
             }
         //list one message only
         }else{
@@ -222,23 +218,51 @@ abstract class RequestContext {
     }
 
     //saving the body
-    protected void post(){
-        System.out.println(__payload);
+    protected void post(BufferedWriter _out) throws IOException{
+        System.out.println("srv: Saving message sent by the user...");
         if (__payload.trim().isEmpty()){
             __messagesSaved.add("[nothing was saved]");
         }else{
             __messagesSaved.add(__payload);
         }
-
-
+        _out.write("Message is saved into index " + __messagesSaved.size());
     }
 
-    protected void put(){
+    protected void put(BufferedWriter _out) throws IOException{
+        //check what to change
+        if( __messagesNumber > __messagesSaved.size() ){
+            _out.write("err: List has only " + __messagesSaved.size() + "\r\n");
+        }else if(__messagesNumber <= 0){
+            _out.write("err: Please write a number bigger than 0\r\n");
+        }
+        else{
+            System.out.println("srv: Changing the value of the message...");
+            if (__payload.trim().isEmpty()){
+                __messagesSaved.set(__messagesNumber - 1, "[nothing was saved]");
+                _out.write("Message is changed\r\nThe new message of index " + __messagesNumber + " is:\r\n[nothing was saved]");
+            }else{
+                __messagesSaved.set(__messagesNumber - 1, __payload);
+                _out.write("Message is changed\r\nThe new message of index " + __messagesNumber + " is:\r\n" + __payload);
+            }
 
+
+        }
     }
 
-    protected void delete(){
-
+    protected void delete(BufferedWriter _out) throws IOException {
+        //check what to delete
+        if( __messagesNumber > __messagesSaved.size() ){
+            _out.write("err: List has only " + __messagesSaved.size() + "\r\n");
+        }else if(__messagesNumber <= 0){
+            _out.write("err: Please write a number bigger than 0\r\n");
+        }
+        else{
+            System.out.println("srv: Deleting the message...");
+            __messagesSaved.remove(__messagesNumber - 1);
+            _out.write("Index " + __messagesNumber + " is deleted!");
+        }
     }
+
+
 
 }

@@ -37,6 +37,7 @@ public class Comm extends RequestContext {
         //separate message
         String[] request = __messageSeparator.toString().split(System.getProperty("line.separator"));
         __messageSeparator = new StringBuilder();
+        boolean skip = true;
         for (String line: request){
             if(!line.isEmpty()){
                 if (http_first_line) {
@@ -55,15 +56,19 @@ public class Comm extends RequestContext {
                     }
                     //saving the payload
                     else{
-                        __messageSeparator.append( line );
-                        __messageSeparator.append( "\r\n" );
+                        if (skip){
+                            skip = false;
+                        }else{
+                            __messageSeparator.append( line );
+                            __messageSeparator.append( "\r\n" );
+                        }
+
                     }
 
                 }
             }
         }
         __payload = __messageSeparator.toString();
-
     }
 
     //read request
