@@ -199,7 +199,7 @@ abstract class RequestContext {
             }
             if(__messagesSaved.size() == 0){
                 System.out.println("srv: err: List is empty" );
-                _out.write("List is empty!\r\nPlease add a message");
+                _out.write("List is empty!\r\nPlease add a message\r\n");
             }
         //list one message only
         }else{
@@ -212,7 +212,7 @@ abstract class RequestContext {
             }
             else{
                 System.out.println("srv: Returning the message..." );
-                _out.write(__messagesSaved.get(__messagesNumber-1));
+                _out.write(__messagesSaved.get(__messagesNumber-1) + "\r\n");
             }
         }
     }
@@ -225,7 +225,7 @@ abstract class RequestContext {
         }else{
             __messagesSaved.add(__payload);
         }
-        _out.write("Message is saved into index " + __messagesSaved.size());
+        _out.write("Message is saved into index " + __messagesSaved.size() + "\r\n");
     }
 
     protected void put(BufferedWriter _out) throws IOException{
@@ -241,10 +241,10 @@ abstract class RequestContext {
             System.out.println("srv: Changing the value of the message...");
             if (__payload.trim().isEmpty()){
                 __messagesSaved.set(__messagesNumber - 1, "[nothing was saved]");
-                _out.write("Message is changed\r\nThe new message of index " + __messagesNumber + " is:\r\n[nothing was saved]");
+                _out.write("Message is changed\r\nThe new message of index " + __messagesNumber + " is:\r\n[nothing was saved]\r\n");
             }else{
                 __messagesSaved.set(__messagesNumber - 1, __payload);
-                _out.write("Message is changed\r\nThe new message of index " + __messagesNumber + " is:\r\n" + __payload);
+                _out.write("Message is changed\r\nThe new message of index " + __messagesNumber + " is:\r\n" + __payload + "\r\n");
             }
 
 
@@ -263,7 +263,7 @@ abstract class RequestContext {
         else{
             System.out.println("srv: Deleting the message...");
             __messagesSaved.remove(__messagesNumber - 1);
-            _out.write("Index " + __messagesNumber + " is deleted!");
+            _out.write("Index " + __messagesNumber + " is deleted!\r\n");
         }
     }
 
