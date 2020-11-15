@@ -15,13 +15,9 @@ abstract class RequestContext {
     protected String __payload;
     protected String[] __command;
     protected int __messagesNumber;
-    List<String> __messagesSaved = new ArrayList<>();
+    protected List<String> __messagesSaved = new ArrayList<>();
     protected StringBuilder __messageSeparator = new StringBuilder();
     protected Map<String, String> __header = new HashMap<>();
-
-    public Verb get__myVerb() {
-        return __myVerb;
-    }
 
     protected void setMyVerb(String myVerb) {
         switch (myVerb) {
@@ -104,6 +100,7 @@ abstract class RequestContext {
         }
     }
 
+    @SuppressWarnings("unused")
     public void showHeader(){
         System.out.println("header:");
         for (Map.Entry<String, String> entry : __header.entrySet()) {
@@ -122,7 +119,7 @@ abstract class RequestContext {
         // 7 - PUT few parameters
         // 8 - POST has no text to save
         // 10 - extra text is written
-        System.out.println("srv: Checking status");
+        System.out.println("srv: Checking for errors...");
 
         //check if command is supported
         if(__myVerb == Verb.OTHER){
@@ -154,7 +151,6 @@ abstract class RequestContext {
                     }
 
                 }
-//
                 //check first parameter
                 if(!__command[1].equals("messages")){
                     System.out.println("srv: Command file not known");
@@ -202,16 +198,20 @@ abstract class RequestContext {
                 count++;
             }
             if(__messagesSaved.size() == 0){
+                System.out.println("srv: err: List is empty" );
                 _out.write("List is empty!\r\nPlease add a message");
             }
         //list one message only
         }else{
             if( __messagesNumber > __messagesSaved.size() ){
+                System.out.println("srv: err: List index does not exist" );
                 _out.write("err: List has only " + __messagesSaved.size() + "\r\n");
             }else if(__messagesNumber <= 0){
+                System.out.println("srv: err: List index <= 0" );
                 _out.write("err: Please write a number bigger than 0\r\n");
             }
             else{
+                System.out.println("srv: Returning the message..." );
                 _out.write(__messagesSaved.get(__messagesNumber-1));
             }
         }
@@ -231,8 +231,10 @@ abstract class RequestContext {
     protected void put(BufferedWriter _out) throws IOException{
         //check what to change
         if( __messagesNumber > __messagesSaved.size() ){
+            System.out.println("srv: err: List index does not exist" );
             _out.write("err: List has only " + __messagesSaved.size() + "\r\n");
         }else if(__messagesNumber <= 0){
+            System.out.println("srv: err: List index <= 0" );
             _out.write("err: Please write a number bigger than 0\r\n");
         }
         else{
@@ -253,7 +255,9 @@ abstract class RequestContext {
         //check what to delete
         if( __messagesNumber > __messagesSaved.size() ){
             _out.write("err: List has only " + __messagesSaved.size() + "\r\n");
+            System.out.println("srv: err: List index does not exist" );
         }else if(__messagesNumber <= 0){
+            System.out.println("srv: err: List index <= 0" );
             _out.write("err: Please write a number bigger than 0\r\n");
         }
         else{
@@ -262,7 +266,5 @@ abstract class RequestContext {
             _out.write("Index " + __messagesNumber + " is deleted!");
         }
     }
-
-
 
 }

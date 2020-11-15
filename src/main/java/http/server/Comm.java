@@ -6,20 +6,14 @@ import java.util.List;
 public class Comm extends RequestContext {
 
     //reader and writer are ready
-    Socket _clientSocket;
-    private BufferedReader _in;
+    private final BufferedReader _in;
     private final BufferedWriter _out;
-    boolean http_first_line = true;
+    private boolean http_first_line = true;
 
     public Comm(Socket clientSocket, List<String> __messagesSaved)  throws IOException{
-        this._clientSocket = clientSocket;
         this._in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         this._out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
         this.__messagesSaved = __messagesSaved;
-    }
-
-    public void set_in(BufferedReader in){
-        this._in = in;
     }
 
     private void readMessage() throws IOException {
@@ -92,7 +86,6 @@ public class Comm extends RequestContext {
         //determine the answer
         _out.write("HTTP/1.1 200 OK\r\n");
         _out.write("Content-Type: text/html\r\n");
-        _out.write("Content-Length: 100\r\n");
         _out.write("\r\n");
 
         //send the answer
